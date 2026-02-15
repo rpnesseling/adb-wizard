@@ -1,0 +1,3 @@
+class AdbWizardError(Exception):
+    pass
+
