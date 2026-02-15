@@ -89,6 +89,38 @@ Settings:
 
 On startup, the tool prints which `adb` is being used (path + source label: project-local or global `PATH`).
 
+## ADB Workflows
+
+Workflows let you define repeatable action chains and run them from:
+
+- `ADB menu` -> `Utilities` -> `Workflow manager`
+
+Workflow storage:
+- Runtime file: `.adb_wizard_workflows.json` (local, ignored by git)
+- Template: `.adb_wizard_workflows.example.json`
+
+Supported workflow step actions:
+- `install_apk` (requires `apk_path`)
+- `clear_data` (requires `package`)
+- `launch_app` (requires `package`, optional `activity`)
+- `tail_filtered_logcat` (optional `tag`, `priority`)
+
+Example workflow:
+
+```json
+[
+  {
+    "name": "sample-dev-loop",
+    "steps": [
+      { "action": "install_apk", "apk_path": "C:/path/to/app.apk" },
+      { "action": "clear_data", "package": "com.example.app" },
+      { "action": "launch_app", "package": "com.example.app", "activity": ".MainActivity" },
+      { "action": "tail_filtered_logcat", "tag": "ExampleTag", "priority": "I" }
+    ]
+  }
+]
+```
+
 ## Menu Options
 
 Top-level menu:
