@@ -13,6 +13,7 @@ class Settings:
     prefer_project_local_platform_tools: bool = False
     remember_last_device: bool = True
     last_device_serial: str = ""
+    active_profile: str = ""
     dry_run: bool = False
     debug_logging: bool = False
     debug_log_file: str = "adb_wizard_debug.log"
@@ -28,6 +29,7 @@ def load_settings() -> Settings:
             prefer_project_local_platform_tools=bool(raw.get("prefer_project_local_platform_tools", False)),
             remember_last_device=bool(raw.get("remember_last_device", True)),
             last_device_serial=str(raw.get("last_device_serial", "")),
+            active_profile=str(raw.get("active_profile", "")),
             dry_run=bool(raw.get("dry_run", False)),
             debug_logging=bool(raw.get("debug_logging", False)),
             debug_log_file=str(raw.get("debug_log_file", "adb_wizard_debug.log")),
@@ -41,6 +43,7 @@ def save_settings(settings: Settings) -> None:
         "prefer_project_local_platform_tools": settings.prefer_project_local_platform_tools,
         "remember_last_device": settings.remember_last_device,
         "last_device_serial": settings.last_device_serial,
+        "active_profile": settings.active_profile,
         "dry_run": settings.dry_run,
         "debug_logging": settings.debug_logging,
         "debug_log_file": settings.debug_log_file,

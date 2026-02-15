@@ -4,6 +4,7 @@ ADB_MENU_LINES = [
     "3) File transfer",
     "4) Logging and diagnostics",
     "5) Utilities",
+    "6) Advanced",
     "0) Exit",
 ]
 
@@ -19,12 +20,13 @@ DEVICE_SESSION_MENU_LINES = [
 APP_PACKAGE_MENU_LINES = [
     "1) Install APK",
     "2) Install split APKs",
-    "3) List packages",
-    "4) Show package info",
-    "5) Launch app",
-    "6) Uninstall package",
-    "7) Force-stop app",
-    "8) Clear app data",
+    "3) APK insight",
+    "4) List packages",
+    "5) Show package info",
+    "6) Launch app",
+    "7) Uninstall package",
+    "8) Force-stop app",
+    "9) Clear app data",
     "0) Back",
 ]
 
@@ -39,11 +41,24 @@ LOGGING_MENU_LINES = [
     "2) Save logcat snapshot",
     "3) Tail filtered logcat",
     "4) Collect logcat + bugreport bundle",
+    "5) Export health report (JSON + TXT)",
     "0) Back",
 ]
 
 UTILITIES_MENU_LINES = [
     "1) Run shell command (!history, !<index>)",
+    "2) Workflow manager",
+    "3) Profile manager",
+    "4) App dev loop mode",
+    "5) Plugin actions",
+    "6) Multi-device broadcast",
+    "0) Back",
+]
+
+ADVANCED_MENU_LINES = [
+    "1) Port forward/reverse manager",
+    "2) Screen capture tools",
+    "3) Wireless pairing (adb pair)",
     "0) Back",
 ]
 

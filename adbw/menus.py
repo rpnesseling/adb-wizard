@@ -12,11 +12,30 @@ from .actions import (
     show_package_info,
     tail_filtered_logcat,
 )
+from .advanced import (
+    apk_insight,
+    build_workflow,
+    create_or_update_profile,
+    delete_profile,
+    export_health_report,
+    list_workflows,
+    manage_port_forwarding,
+    multi_device_broadcast,
+    run_dev_loop,
+    run_plugins,
+    run_workflow,
+    screen_capture_tools,
+    select_profile,
+    view_profiles,
+    wireless_pairing,
+    load_profiles,
+)
 from .adb import adb_cmd, ensure_adb, run, run_streaming
 from .config import SETTINGS_FILE, Settings, save_settings
 from .devices import Device, list_devices, pick_device, show_device_summary
 from .ui_strings import (
     ADB_MENU_LINES,
+    ADVANCED_MENU_LINES,
     APP_PACKAGE_MENU_LINES,
     DEVICE_SESSION_MENU_LINES,
     FILE_TRANSFER_MENU_LINES,
@@ -190,15 +209,18 @@ def _show_app_package_menu(adb_path: str, device: Device) -> None:
             install_split_apks(adb_path, device.serial)
             continue
         if choice == "3":
-            list_packages(adb_path, device.serial)
+            apk_insight(adb_path, device.serial)
             continue
         if choice == "4":
-            show_package_info(adb_path, device.serial)
+            list_packages(adb_path, device.serial)
             continue
         if choice == "5":
-            launch_app(adb_path, device.serial)
+            show_package_info(adb_path, device.serial)
             continue
         if choice == "6":
+            launch_app(adb_path, device.serial)
+            continue
+        if choice == "7":
             _handle_package_action(
                 adb_path,
                 device.serial,
@@ -207,7 +229,7 @@ def _show_app_package_menu(adb_path: str, device: Device) -> None:
                 "Uninstall command sent.",
             )
             continue
-        if choice == "7":
+        if choice == "8":
             _handle_package_action(
                 adb_path,
                 device.serial,
@@ -216,7 +238,7 @@ def _show_app_package_menu(adb_path: str, device: Device) -> None:
                 "Force-stop command sent.",
             )
             continue
-        if choice == "8":
+        if choice == "9":
             _handle_package_action(
                 adb_path,
                 device.serial,
@@ -272,10 +294,69 @@ def _show_logging_menu(adb_path: str, device: Device) -> None:
                 continue
             collect_bugreport_bundle(adb_path, device.serial)
             continue
+        if choice == "5":
+            export_health_report(adb_path, device.serial)
+            continue
         print("Unknown option.")
 
 
-def _show_utilities_menu(adb_path: str, device: Device, shell_history: List[str]) -> None:
+def _show_workflow_manager(adb_path: str, serial: str) -> None:
+    while True:
+        print("\nWorkflow manager")
+        print("1) List workflows")
+        print("2) Create/update workflow")
+        print("3) Run workflow")
+        print("0) Back")
+        choice = input("> ").strip()
+        if choice == "0":
+            return
+        if choice == "1":
+            list_workflows()
+            continue
+        if choice == "2":
+            build_workflow()
+            continue
+        if choice == "3":
+            run_workflow(adb_path, serial)
+            continue
+        print("Unknown option.")
+
+
+def _show_profile_manager(settings: Settings) -> None:
+    while True:
+        print("\nProfile manager")
+        print(f"Active profile: {settings.active_profile or 'none'}")
+        print("1) List profiles")
+        print("2) Create/update profile")
+        print("3) Delete profile")
+        print("4) Set active profile")
+        print("0) Back")
+        choice = input("> ").strip()
+        if choice == "0":
+            return
+        if choice == "1":
+            view_profiles()
+            continue
+        if choice == "2":
+            create_or_update_profile()
+            continue
+        if choice == "3":
+            delete_profile()
+            if settings.active_profile and settings.active_profile not in load_profiles():
+                settings.active_profile = ""
+                save_settings(settings)
+            continue
+        if choice == "4":
+            name = select_profile(load_profiles())
+            if name:
+                settings.active_profile = name
+                save_settings(settings)
+                print(f"Active profile set: {name}")
+            continue
+        print("Unknown option.")
+
+
+def _show_utilities_menu(adb_path: str, device: Device, shell_history: List[str], settings: Settings) -> None:
     while True:
         print("\nUtilities")
         print(f"Device: {device.serial} [{device.state}]")
@@ -286,6 +367,42 @@ def _show_utilities_menu(adb_path: str, device: Device, shell_history: List[str]
             return
         if choice == "1":
             _handle_shell_command(adb_path, device.serial, shell_history)
+            continue
+        if choice == "2":
+            _show_workflow_manager(adb_path, device.serial)
+            continue
+        if choice == "3":
+            _show_profile_manager(settings)
+            continue
+        if choice == "4":
+            run_dev_loop(adb_path, device.serial, active_profile=settings.active_profile)
+            continue
+        if choice == "5":
+            run_plugins(adb_path, device.serial)
+            continue
+        if choice == "6":
+            multi_device_broadcast(adb_path)
+            continue
+        print("Unknown option.")
+
+
+def _show_advanced_menu(adb_path: str, device: Device) -> None:
+    while True:
+        print("\nAdvanced")
+        print(f"Device: {device.serial} [{device.state}]")
+        _print_menu(ADVANCED_MENU_LINES)
+        choice = input("> ").strip()
+
+        if choice == "0":
+            return
+        if choice == "1":
+            manage_port_forwarding(adb_path, device.serial)
+            continue
+        if choice == "2":
+            screen_capture_tools(adb_path, device.serial)
+            continue
+        if choice == "3":
+            wireless_pairing(adb_path)
             continue
         print("Unknown option.")
 
@@ -314,7 +431,10 @@ def show_basic_menu(adb_path: str, device: Device, settings: Settings) -> Device
             _show_logging_menu(adb_path, device)
             continue
         if choice == "5":
-            _show_utilities_menu(adb_path, device, shell_history)
+            _show_utilities_menu(adb_path, device, shell_history, settings)
+            continue
+        if choice == "6":
+            _show_advanced_menu(adb_path, device)
             continue
         print("Unknown option.")
 
@@ -383,4 +503,3 @@ def show_settings_menu(settings: Settings) -> bool:
             print(f"Saved {SETTINGS_FILE}: last_device_serial cleared.")
             return True
         print("Unknown option.")
-

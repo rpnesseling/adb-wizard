@@ -17,6 +17,8 @@ Thumbs.db
 
 # Local app settings
 .adb_wizard_settings.json
+.adb_wizard_profiles.json
+.adb_wizard_workflows.json
 
 # Downloaded Android platform-tools (project-local, not source)
 platform-tools/

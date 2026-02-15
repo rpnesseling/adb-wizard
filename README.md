@@ -1,6 +1,6 @@
 # adb-wizard
 
-Simple interactive Python CLI for common Android Debug Bridge (ADB) tasks.
+Feature-rich interactive Python CLI for Android Debug Bridge (ADB) workflows across device/session management, app/package tasks, file transfer, diagnostics, and automation.
 
 ## Features
 
@@ -14,6 +14,7 @@ Simple interactive Python CLI for common Android Debug Bridge (ADB) tasks.
 ### App and package
 - Installs APKs with `adb install -r`
 - Installs split APK sets with `adb install-multiple -r`
+- APK insight mode (reads metadata when `aapt` is available and warns on potential downgrade/signature issues)
 - Supports package utilities (list/info/launch/uninstall/force-stop/clear data)
 
 ### File transfer
@@ -22,10 +23,19 @@ Simple interactive Python CLI for common Android Debug Bridge (ADB) tasks.
 ### Logging and diagnostics
 - Tails `logcat`, supports filtered tailing, and saves timestamped log snapshots
 - Collects diagnostics bundle (`logcat` + `bugreport`)
+- Exports device health report in JSON and TXT
 
 ### Utilities and runtime
 - Runs arbitrary `adb shell` commands
 - Includes shell command history shortcuts (`!history`, `!<index>`)
+- Workflow manager for scripted action chains (create/list/run)
+- Profile manager for app/package/log presets
+- App dev loop mode (install + clear data + launch + filtered logcat)
+- Multi-device broadcast actions (install APK or shell command across connected devices)
+- Plugin hooks from `plugins/*.py`
+- Port forward/reverse manager
+- Screen capture tools (screenshot + screenrecord pull)
+- Wireless pairing (`adb pair`)
 - Auto-installs project-local Android platform-tools in `./platform-tools` when `adb` is not found
 - Prints which `adb` binary is active (project-local or global `PATH`)
 - Runs startup preflight checks and retries transient adb failures
@@ -61,6 +71,7 @@ If the file does not exist, it is created when a setting is toggled.
   "prefer_project_local_platform_tools": false,
   "remember_last_device": true,
   "last_device_serial": "",
+  "active_profile": "",
   "dry_run": false,
   "debug_logging": false,
   "debug_log_file": "adb_wizard_debug.log"
@@ -71,6 +82,7 @@ Settings:
 - `prefer_project_local_platform_tools`: Prefer `./platform-tools/adb` over global `adb` on `PATH` when both exist.
 - `remember_last_device`: Reuse last selected device automatically when multiple are connected.
 - `last_device_serial`: Stored serial used when `remember_last_device` is enabled.
+- `active_profile`: Profile name to prefill app dev loop defaults.
 - `dry_run`: Print commands without executing them.
 - `debug_logging`: Write command-level debug logs to file.
 - `debug_log_file`: Debug log output path.
@@ -101,13 +113,15 @@ ADB menu:
 1. Device and session  
    Submenu: show summary, switch device, reboot, connect/disconnect Wi-Fi (with confirmations for connect/disconnect)
 2. App and package  
-   Submenu: install APK, install split APKs, list/info/launch package, uninstall/force-stop/clear data (with confirmations for destructive actions)
+   Submenu: install APK, install split APKs, APK insight, list/info/launch package, uninstall/force-stop/clear data (with confirmations for destructive actions)
 3. File transfer  
    Submenu: push/pull files
 4. Logging and diagnostics  
-   Submenu: tail logcat, save snapshot, filtered tail, collect bundle (`logcat` + `bugreport`, with confirmation)
+   Submenu: tail logcat, save snapshot, filtered tail, collect bundle (`logcat` + `bugreport`, with confirmation), health report export
 5. Utilities  
-   Submenu: run shell command (supports `!history` and `!<index>`)
+   Submenu: shell command, workflow manager, profile manager, app dev loop mode, plugin actions, multi-device broadcast
+6. Advanced  
+   Submenu: port forward/reverse manager, screen capture tools, wireless pairing
 0. Exit
 
 ## Example Session
@@ -120,6 +134,7 @@ Device: R58M123456A [device]
 3) File transfer
 4) Logging and diagnostics
 5) Utilities
+6) Advanced
 ...
 0) Exit
 > 1
@@ -146,9 +161,11 @@ Device: R58M123456A [device]
 - `adbw/adb.py`: adb discovery/install, command execution, retries, dry-run/debug runtime behavior.
 - `adbw/devices.py`: device listing/selection and device summary/preflight helpers.
 - `adbw/actions.py`: task-specific adb actions (install, packages, logs, Wi-Fi, diagnostics).
+- `adbw/advanced.py`: workflows, profiles, dev loop, diagnostics export, pairing, broadcast, plugins.
 - `adbw/menus.py`: interactive submenus and user prompts.
 - `adbw/ui_strings.py`: centralized menu/UI text constants.
 - `adbw/errors.py`: app-specific exception type.
+- `plugins/example_plugin.py`: minimal plugin action example.
 
 ## Testing
 

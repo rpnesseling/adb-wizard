@@ -1,0 +1,9 @@
+{
+  "prefer_project_local_platform_tools": false,
+  "remember_last_device": true,
+  "last_device_serial": "",
+  "active_profile": "",
+  "dry_run": false,
+  "debug_logging": false,
+  "debug_log_file": "adb_wizard_debug.log"
+}
