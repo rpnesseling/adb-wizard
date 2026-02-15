@@ -63,6 +63,14 @@ def get_device_ip(adb_path: str, serial: str) -> str:
 
 
 def show_device_summary(adb_path: str, serial: str) -> None:
+    data = get_device_summary_data(adb_path, serial)
+    print(
+        f"Brand: {data['brand']}\nModel: {data['model']}\nAndroid: {data['android_version']} (API {data['api_level']})\n"
+        f"ABI: {data['abi']}\nBattery: {data['battery_level']}%\nIP: {data['ip']}"
+    )
+
+
+def get_device_summary_data(adb_path: str, serial: str) -> dict:
     model = run(adb_cmd(adb_path, serial, "shell", "getprop", "ro.product.model")).stdout.strip()
     brand = run(adb_cmd(adb_path, serial, "shell", "getprop", "ro.product.brand")).stdout.strip()
     android_ver = run(adb_cmd(adb_path, serial, "shell", "getprop", "ro.build.version.release")).stdout.strip()
@@ -76,10 +84,16 @@ def show_device_summary(adb_path: str, serial: str) -> None:
             level = line.split(":", 1)[1].strip()
             break
     ip = get_device_ip(adb_path, serial) or "unknown"
-    print(
-        f"Brand: {brand}\nModel: {model}\nAndroid: {android_ver} (API {api_level})\n"
-        f"ABI: {abi}\nBattery: {level}%\nIP: {ip}"
-    )
+    return {
+        "serial": serial,
+        "brand": brand,
+        "model": model,
+        "android_version": android_ver,
+        "api_level": api_level,
+        "abi": abi,
+        "battery_level": level,
+        "ip": ip,
+    }
 
 
 def show_preflight(adb_path: str) -> None:
@@ -91,4 +105,3 @@ def show_preflight(adb_path: str) -> None:
         print(f"Preflight: adb server OK, connected device entries: {device_count}")
     else:
         print("Preflight: adb server started, no active device selected yet.")
-

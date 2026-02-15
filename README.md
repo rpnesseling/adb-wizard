@@ -74,6 +74,39 @@ python adb_wizard.py
 If one device is connected, it is selected automatically.  
 If multiple devices are connected, choose one from the prompt.
 
+## JSON/API Mode
+
+For CI or scripting, run non-interactive mode:
+
+```powershell
+python adb_wizard.py --json --cmd devices.list
+```
+
+Optional arguments:
+- `--serial <device-serial>`: target a specific device
+- `--params <json-or-kv>`: command parameters as JSON (`{"key":"value"}`) or `key=value,key2=value2`
+
+Supported `--cmd` values:
+- `system.info`
+- `devices.list`
+- `device.summary`
+- `shell.run`
+- `package.list`
+- `package.info`
+- `apk.install`
+- `file.push`
+- `file.pull`
+- `logcat.snapshot`
+
+Examples:
+
+```powershell
+python adb_wizard.py --json --cmd device.summary --serial ABC123
+python adb_wizard.py --json --cmd shell.run --serial ABC123 --params "command=getprop ro.build.version.release"
+python adb_wizard.py --json --cmd package.list --serial ABC123 --params "third_party=true"
+python adb_wizard.py --json --cmd apk.install --serial ABC123 --params "apk_path=C:/path/to/app.apk"
+```
+
 Settings file:
 
 `adb_wizard.py` reads `.adb_wizard_settings.json` from the project root and updates it from the Settings menu.
