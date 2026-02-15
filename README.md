@@ -10,13 +10,15 @@ Simple interactive Python CLI for common Android Debug Bridge (ADB) tasks.
 - Installs APKs with `adb install -r`
 - Runs arbitrary `adb shell` commands
 - Tails `logcat` output
+- Auto-installs project-local Android platform-tools in `./platform-tools` when `adb` is not found
+- Prints which `adb` binary is active (project-local or global `PATH`)
 
 ## Requirements
 
 - Python 3.9+
-- ADB available in one of these locations:
-  - On your `PATH`
-  - `./platform-tools/adb` (`adb.exe` on Windows)
+- Either:
+  - `adb` already available on your `PATH`, or
+  - internet access on first run so the tool can download project-local platform-tools to `./platform-tools`
 - Android device with:
   - Developer Options enabled
   - USB Debugging enabled
@@ -31,8 +33,39 @@ python adb_wizard.py
 If one device is connected, it is selected automatically.  
 If multiple devices are connected, choose one from the prompt.
 
+Settings file:
+
+`adb_wizard.py` reads `.adb_wizard_settings.json` from the project root and updates it from the Settings menu.
+If the file does not exist, it is created when a setting is toggled.
+
+```json
+{
+  "prefer_project_local_platform_tools": false
+}
+```
+
+Settings:
+- `prefer_project_local_platform_tools`: Prefer `./platform-tools/adb` over global `adb` on `PATH` when both exist.
+
+On startup, the tool prints which `adb` is being used (path + source label: project-local or global `PATH`).
+
 ## Menu Options
 
+Top-level menu:
+1. ADB menu
+2. Platform tools
+3. Settings
+0. Exit
+
+Platform tools:
+1. Force install project-local platform-tools (`./platform-tools`, not system-wide)
+0. Back
+
+Settings:
+1. Toggle `prefer_project_local_platform_tools`
+0. Back
+
+ADB menu:
 1. Show device props  
    Prints:
    - `ro.product.brand`
@@ -62,7 +95,7 @@ Device: R58M123456A [device]
 ## Troubleshooting
 
 - `adb not found`
-  - Install Android platform-tools, or place `adb` in `./platform-tools/`
+  - Install Android platform-tools system-wide, or place `adb` in `./platform-tools/` for project-local use (not system-wide)
 - `No devices found`
   - Check cable/USB mode, enable USB debugging, run `adb devices`
 - `Device is unauthorized`

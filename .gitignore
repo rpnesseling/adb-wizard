@@ -14,3 +14,9 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local app settings
+.adb_wizard_settings.json
+
+# Downloaded Android platform-tools (project-local, not source)
+platform-tools/
