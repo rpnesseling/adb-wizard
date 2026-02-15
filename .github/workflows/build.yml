@@ -67,13 +67,19 @@ jobs:
         with:
           path: artifacts
 
-      - name: Create checksums
+      - name: Prepare release assets
         run: |
-          cd artifacts
-          find . -type f -maxdepth 2 -print0 | xargs -0 sha256sum > SHA256SUMS.txt
+          mkdir -p release-assets
+          cp artifacts/adb-wizard-windows/adb-wizard.exe release-assets/adb-wizard-windows.exe
+          cp artifacts/adb-wizard-linux/adb-wizard release-assets/adb-wizard-linux
+          cp artifacts/adb-wizard-macos/adb-wizard release-assets/adb-wizard-macos
+          cd release-assets
+          sha256sum * > SHA256SUMS.txt
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          overwrite_files: true
+          fail_on_unmatched_files: true
           files: |
-            artifacts/**/*
+            release-assets/*
